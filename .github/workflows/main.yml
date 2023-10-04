@@ -48,9 +48,10 @@ jobs:
   
       - name: Test /healthz
         run: |
-          if [ $(curl -s http://localhost:9000/healthz) = "200" ]; then
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9000/healthz)
+          if [ "$response" = "200" ]; then
             echo "Health check passed"
           else
-            echo "Health check failed"  
+            echo "Health check failed"
             exit 1
           fi
