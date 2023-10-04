@@ -20,6 +20,46 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: ${{ env.MYSQL_ROOT_PASSWORD }}
 
+    # steps:
+
+    # - name: Checkout code
+    #   uses: actions/checkout@v2
+
+    # - name: Setup Node.js
+    #   uses: actions/setup-node@v2
+
+    # - name: Install dependencies
+    #   run: npm install
+
+    # # Use systemctl to control service
+    # - name: Start MySQL
+    #   run: sudo systemctl start mysql
+
+    # - name: Verify MySQL status
+    #   run: sudo systemctl status mysql
+
+    # - name: Check MySQL logs
+    #   run: sudo journalctl -u MySQL 
+     
+    # - name: Wait for MySQL to start
+    #   run: sleep 10
+
+    # - name: Create MySQL configuration file
+    #   run: echo -e "[client]\nuser=root\npassword=${{ env.MYSQL_ROOT_PASSWORD }}" > ~/.my.cnf
+      
+    # - name: Allow password change for root in MySQL
+    #   run: |
+    #     mysql -u root -p "${{ env.MYSQL_ROOT_PASSWORD }}" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${{ env.MYSQL_ROOT_PASSWORD }}'"
+  
+    # - name: Create DB
+    #   run: |
+    #     mysql -u root -e "CREATE DATABASE assignment1"
+
+    # - name: Run tests
+    #   run: npm test
+
+    # - name: Start app
+    #   run: npm start &
     steps:
 
     - name: Checkout code
@@ -32,6 +72,19 @@ jobs:
       run: npm install
 
     # Use systemctl to control service
+    - name: Start MySQL with skip-grant-tables
+      run: sudo systemctl stop mysql && sudo mysqld_safe --skip-grant-tables &
+
+    - name: Wait for MySQL to start
+      run: sleep 10
+
+    - name: Change MySQL root password
+      run: |
+        mysql -u root mysql -e "UPDATE user SET authentication_string=PASSWORD('${{ env.MYSQL_ROOT_PASSWORD }}') WHERE user='root'; FLUSH PRIVILEGES;"
+
+    - name: Stop MySQL
+      run: sudo systemctl stop mysql
+
     - name: Start MySQL
       run: sudo systemctl start mysql
 
@@ -39,28 +92,18 @@ jobs:
       run: sudo systemctl status mysql
 
     - name: Check MySQL logs
-      run: sudo journalctl -u MySQL 
-     
-    - name: Wait for MySQL to start
-      run: sleep 10
+      run: sudo journalctl -u mysql 
 
-    - name: Create MySQL configuration file
-      run: echo -e "[client]\nuser=root\npassword=${{ env.MYSQL_ROOT_PASSWORD }}" > ~/.my.cnf
-      
-    - name: Allow password change for root in MySQL
-      run: |
-        mysql -u root -p "${{ env.MYSQL_ROOT_PASSWORD }}" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${{ env.MYSQL_ROOT_PASSWORD }}'"
-  
     - name: Create DB
       run: |
-        mysql -u root -e "CREATE DATABASE assignment1"
+        mysql -u root -p "${{ env.MYSQL_ROOT_PASSWORD }}" -e "CREATE DATABASE assignment1"
 
     - name: Run tests
       run: npm test
 
     - name: Start app
       run: npm start &
-        
+
     - name: Test /healthz
       run: |
         if [ $(curl -s http://localhost:9000/healthz) = "200" ]; then
