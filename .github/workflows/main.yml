@@ -32,8 +32,16 @@ jobs:
           docker logs mysql-container
         continue-on-error: true
 
-      - name: Check MySQL health
-        run: docker exec mysql-container mysqladmin ping -h 127.0.0.1 -P 3306 -u root --password=1998@Pupss
+      - name: Wait for MySQL to be ready
+        run: |
+          for i in {1..30}; do
+            if docker exec mysql-container mysqladmin ping -h 127.0.0.1 -P 3306 -u root --password=1998@Pupss; then
+              break
+            else
+              echo "MySQL not ready, retrying in 5 seconds..."
+              sleep 5
+            fi
+          done
 
       - name: Run tests
         run: npm test
