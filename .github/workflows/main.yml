@@ -37,6 +37,8 @@ jobs:
           mysql -e "CREATE DATABASE assignment1;"
         continue-on-error: true
 
+
+
       - name: Set MySQL root password
         run: |
           mysqladmin -u root password '1998@Pupss'
