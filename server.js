@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(cors());
 
-const sequelize = new Sequelize("assignment1", "root", "1998@Pupss", {
+const sequelize = new Sequelize("assignment1", "root", "1998@Pupsss", {
   host: "localhost",
   dialect: "mysql",
 });
