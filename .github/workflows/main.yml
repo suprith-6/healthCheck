@@ -41,6 +41,9 @@ jobs:
 
     - name: Supertest installation
       run: npm install --save-dev supertest
+
+    - name: Babel installation for ES6
+      run: npm install --save-dev babel-jest @babel/core @babel/preset-env
     
     - name: Run integration tests
       env:
