@@ -1,79 +1,45 @@
-name: Node.js CI
+name: Health Check Integration Tests
 
-on:
- push:
+on: 
+  push:
     branches: [main]
- pull_request:
+  pull_request:
     branches: [main]
-
-# env:
-#  MYSQL_ROOT_PASSWORD: "1998@Pupss"
-
+    
+    
 jobs:
- test:
+
+  test:
 
     runs-on: ubuntu-latest
 
     services:
+    
       mysql:
-        image: mysql:latest
+        image: mysql:8  
         env:
-          MYSQL_ROOT_PASSWORD: 1998@Pupss
-          MYSQL_DATABASE: assignment1
-          MYSQL_USER: root
-          MYSQL_PASSWORD: 1998@Pupss
+          MYSQL_ROOT_PASSWORD: 1998@Pupss 
         ports:
-            - '8888:3306'
-        # options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-
+    
     - name: Checkout code
       uses: actions/checkout@v2
 
     - name: Setup Node.js
       uses: actions/setup-node@v2
-
+      with:
+        node-version: 14
+        
     - name: Install dependencies
       run: npm install
-
-    - name: Start MySQL
-      run: sudo systemctl start mysql
-
-    - name: Verify MySQL status
-      run: sudo systemctl status mysql
-
-    - name: Check MySQL logs
-      run: sudo journalctl -u MySQL 
-
-    - name: Checking the credentials
-      run: sudo grep -A1 '^root\[' /etc/mysql/my.cnf
-
-    - name: Grant CREATE privilege to root user
-      run: |
-        mysql -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} -e "GRANT CREATE ON *.* TO 'root'@'localhost' WITH GRANT OPTION;"
-
-    - name: Create DB
-      run: |
-        if ! mysql -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE assignment1"; then
-          echo "Failed to create the database"
-          exit 1
-        fi
-
-    - name: Check MySQL Error Log
-      run: sudo cat /var/log/mysql/error.log
-
-    - name: Run tests
-      run: npm test
-
-    - name: Start app
-      run: npm start &
-
-    - name: Test /healthz
-      run: |
-        if [ $(curl -s http://localhost:9000/healthz) = "200" ]; then
-          echo "Health check passed"
-        else
-          echo "Health check failed"  
-          exit 1
-        fi
+    
+    - name: Run integration tests
+      env:
+        DATABASE_HOST: 127.0.0.1
+        DATABASE_USER: root
+        DATABASE_PASSWORD: 1998@Pupss
+        DATABASE_DB: assignment1
+      run: npm run test:integration
