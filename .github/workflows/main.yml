@@ -44,6 +44,12 @@ jobs:
 
     - name: Babel installation for ES6
       run: npm install --save-dev babel-jest @babel/core @babel/preset-env
+
+    - name: Start MySQL
+      run: sudo systemctl start mysql
+
+    - name: Verify MySQL status
+      run: sudo systemctl status mysql
     
     - name: Run integration tests
       env:
