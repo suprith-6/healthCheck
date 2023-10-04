@@ -60,7 +60,7 @@ jobs:
 
     # - name: Start app
     #   run: npm start &
-    steps:
+     steps:
 
     - name: Checkout code
       uses: actions/checkout@v2
@@ -72,15 +72,24 @@ jobs:
       run: npm install
 
     # Use systemctl to control service
-    - name: Start MySQL with skip-grant-tables
-      run: sudo systemctl stop mysql && sudo mysqld_safe --skip-grant-tables &
+    - name: Start MySQL
+      run: sudo systemctl start mysql
+
+    - name: Verify MySQL status
+      run: sudo systemctl status mysql
+
+    - name: Check MySQL logs
+      run: sudo journalctl -u mysql 
 
     - name: Wait for MySQL to start
-      run: sleep 10
+      run: |
+        while ! mysqladmin ping -hlocalhost --silent; do
+          sleep 1
+        done
 
     - name: Change MySQL root password
       run: |
-        mysql -u root mysql -e "UPDATE user SET authentication_string=PASSWORD('${{ env.MYSQL_ROOT_PASSWORD }}') WHERE user='root'; FLUSH PRIVILEGES;"
+        mysql -u root -p"${{ env.MYSQL_ROOT_PASSWORD }}" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${{ env.MYSQL_ROOT_PASSWORD }}'"
 
     - name: Stop MySQL
       run: sudo systemctl stop mysql
@@ -96,13 +105,14 @@ jobs:
 
     - name: Create DB
       run: |
-        mysql -u root -p "${{ env.MYSQL_ROOT_PASSWORD }}" -e "CREATE DATABASE assignment1"
+        mysql -u root -p"${{ env.MYSQL_ROOT_PASSWORD }}" -e "CREATE DATABASE assignment1"
 
     - name: Run tests
       run: npm test
 
     - name: Start app
       run: npm start &
+
 
     - name: Test /healthz
       run: |
