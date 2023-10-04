@@ -6,8 +6,8 @@ on:
   pull_request:
     branches: [main]
 
-env:
-  MYSQL_ROOT_PASSWORD: "1998@Pupss"
+# env:
+#   MYSQL_ROOT_PASSWORD: "1998@Pupss"
 
 jobs:
   test:
@@ -15,10 +15,12 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      db:
-        image: mysql 
+      mysql:
+        image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: ${{ env.MYSQL_ROOT_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: "1998@Pupss"
+          MYSQL_DATABASE: assignment1
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
           
     steps:
 
@@ -43,10 +45,8 @@ jobs:
 
     - name: Setting Root password for MySQL
       run: |
-          sudo mysql
-          ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY "${{ env.MYSQL_ROOT_PASSWORD }}";
-          FLUSH PRIVILEGES;
-
+        sudo mysql -h localhost -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '1998@Pupss';"
+      
     - name: Stop MySQL
       run: sudo systemctl stop mysql
 
