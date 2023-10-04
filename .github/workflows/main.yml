@@ -32,9 +32,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Clean npm cache
+    - name: Clear npm cache
       run: npm cache clean --force
-      working-directory: ${{ github.workspace }} # Set the working directory to the root of your project
+    - name: Set npm cache path
+      run: npm config set cache ~/.npm
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
