@@ -52,7 +52,6 @@ jobs:
 
     - name: Create DB
       run: |
-        run: |
           if ! sudo mysql -u root -p1998@Pupss -e "CREATE DATABASE assignment1"; then
           echo "Failed to create the database"
           exit 1
