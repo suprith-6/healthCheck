@@ -1,28 +1,27 @@
 name: Node.js CI
 
-on: 
+on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
 env:
-  MYSQL_ROOT_PASSWORD: "1998@Pupss" 
+  MYSQL_ROOT_PASSWORD: "1998@Pupss"
 
 jobs:
-
   test:
 
     runs-on: ubuntu-latest
 
     services:
       db:
-        image: mysql
+        image: mysql 
         env:
           MYSQL_ROOT_PASSWORD: ${{ env.MYSQL_ROOT_PASSWORD }}
 
     steps:
-    
+
     - name: Checkout code
       uses: actions/checkout@v2
 
@@ -32,21 +31,15 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Verify MySQL is running
-      run: |
-        sudo service mysql status
+    # Use systemctl to control service
+    - name: Start MySQL
+      run: sudo systemctl start mysql
 
-    - name: Check port 
-      run: |
-        sudo lsof -i:3306
+    - name: Verify MySQL status
+      run: sudo systemctl status mysql
 
-    - name: Test connectivity   
-      run: |
-        mysqladmin -u root -p${{ env.MYSQL_ROOT_PASSWORD }} ping
-
-    - name: Start MySQL service
-      run: | 
-        sudo service mysql start
+    - name: Check MySQL logs
+      run: sudo journalctl -u mysql 
 
     - name: Create DB
       run: |
