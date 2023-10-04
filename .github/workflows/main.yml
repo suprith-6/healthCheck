@@ -46,11 +46,21 @@ jobs:
       - name: Start app
         run: npm start &
   
+      # - name: Test /healthz
+      #   run: |
+      #     if [ $(curl -s http://localhost:9000/healthz) == "200" ]; then
+      #       echo "Health check passed"
+      #     else
+      #       echo "Health check failed"  
+      #       exit 1
+      #     fi
+
       - name: Test /healthz
         run: |
-          if [ $(curl -s http://localhost:9000/healthz) == "200" ]; then
-            echo "Health check passed"
-          else
-            echo "Health check failed"  
-            exit 1
-          fi
+            response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9000/healthz)
+            if [ -n "$response" ] && [ "$response" = "200" ]; then
+              echo "Health check passed"
+            else
+              echo "Health check failed"  
+              exit 1
+            fi
