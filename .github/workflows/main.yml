@@ -63,7 +63,7 @@ jobs:
 
     - name: Create DB
       run: |
-        mysql -u root -p "1998@Pupss" -e "CREATE DATABASE assignment1"
+        sudo mysql -u root -p "1998@Pupss" -e "CREATE DATABASE assignment1"
 
     - name: Run tests
       run: npm test
