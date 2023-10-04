@@ -46,6 +46,9 @@ jobs:
     - name: Check MySQL logs
       run: sudo journalctl -u MySQL 
 
+    - name: Checking the credentials
+      run: sudo cat /etc/mysql/my.cnf
+
     - name: Grant CREATE privilege to root user
       run: |
         mysql -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} -e "GRANT CREATE ON *.* TO 'root'@'localhost' WITH GRANT OPTION;"
