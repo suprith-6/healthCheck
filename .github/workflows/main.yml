@@ -18,7 +18,7 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: 1998@Pupss
+          MYSQL_ROOT_PASSWORD: ''
           MYSQL_DATABASE: assignment1
         ports:
             - '8888:3306'
@@ -45,9 +45,10 @@ jobs:
     - name: Check MySQL logs
       run: sudo journalctl -u mysql 
 
-    # - name: Setting Root password for MySQL
-    #   run: |
-    #     sudo mysqladmin -u root password "1998@Pupss"
+    - name: Setting Root password for MySQL
+      run: |
+         sudo mysql -e "UPDATE mysql.user SET authentication_string=PASSWORD('1998@Pupss') WHERE User='root';"
+         sudo mysql -e "FLUSH PRIVILEGES;"
       
     # - name: Stop MySQL
     #   run: sudo systemctl stop mysql
