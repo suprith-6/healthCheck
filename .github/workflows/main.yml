@@ -49,6 +49,9 @@ jobs:
     #   run: |
     #     sudo mysql -u root -p"1998@Pupss" -e "SELECT user, host FROM mysql.user WHERE user = 'root';"
 
+    - name: Grant CREATE privilege to root user
+      run: mysql -u root -p"1998@Pupss" -e "GRANT CREATE ON *.* TO 'root'@'localhost' WITH GRANT OPTION;"
+
 
     - name: Create DB
       run: |
