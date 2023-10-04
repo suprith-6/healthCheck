@@ -54,7 +54,7 @@ jobs:
 
     - name: Grant MySQL Privileges
       run: |
-          mysql -h 127.0.0.1 -u root -p'1998@Pupss' <<EOF
+          mysql -h 127.0.0.1 -u root -p1998@Pupss <<EOF
           GRANT ALL PRIVILEGES ON assignment1.* TO 'root'@'localhost' IDENTIFIED BY '1998@Pupss';
           FLUSH PRIVILEGES;
           EOF
