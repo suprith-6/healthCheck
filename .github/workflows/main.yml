@@ -1,15 +1,16 @@
 name: Node.js CI
 
 on:
-  push:
+ push:
     branches: [main]
-  pull_request:
+ pull_request:
     branches: [main]
 
-
+env:
+ MYSQL_ROOT_PASSWORD: "1998@Pupss"
 
 jobs:
-  test:
+ test:
 
     runs-on: ubuntu-latest
 
@@ -17,12 +18,12 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: 1998@Pupss
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: assignment1
         ports:
             - '8888:3306'
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-          
+
     steps:
 
     - name: Checkout code
@@ -34,7 +35,6 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    # Use systemctl to control service
     - name: Start MySQL
       run: sudo systemctl start mysql
 
@@ -44,17 +44,16 @@ jobs:
     - name: Check MySQL logs
       run: sudo journalctl -u MySQL 
 
-
     - name: Grant CREATE privilege to root user
-      run: mysql -u root -p"1998@Pupss" -e "GRANT CREATE ON *.* TO 'root'@'localhost' WITH GRANT OPTION;"
-
+      run: |
+        mysql -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} -e "GRANT CREATE ON *.* TO 'root'@'localhost' WITH GRANT OPTION;"
 
     - name: Create DB
       run: |
-          if ! mysql -u root -p1998@Pupss -e "CREATE DATABASE assignment1"; then
+        if ! mysql -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE assignment1"; then
           echo "Failed to create the database"
           exit 1
-          fi
+        fi
 
     - name: Check MySQL Error Log
       run: sudo cat /var/log/mysql/error.log
