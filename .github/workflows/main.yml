@@ -60,7 +60,7 @@ jobs:
 
     # - name: Start app
     #   run: npm start &
-     steps:
+    steps:
 
     - name: Checkout code
       uses: actions/checkout@v2
@@ -112,7 +112,6 @@ jobs:
 
     - name: Start app
       run: npm start &
-
 
     - name: Test /healthz
       run: |
