@@ -18,7 +18,7 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: "1998@Pupss"
+          MYSQL_ROOT_PASSWORD: 1998@Pupss
           MYSQL_DATABASE: assignment1
         ports:
             - '8888:3306'
