@@ -35,6 +35,7 @@ jobs:
           echo "skip-log-bin" | sudo tee -a /etc/mysql/mysql.conf.d/mysqld.cnf
           sudo service mysql restart
           mysql -e "CREATE DATABASE assignment1;"
+        continue-on-error: true
 
       - name: Set MySQL root password
         run: |
