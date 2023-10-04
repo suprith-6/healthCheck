@@ -39,7 +39,12 @@ jobs:
       run: sudo systemctl status mysql
 
     - name: Check MySQL logs
-      run: sudo journalctl -u mysql 
+      run: sudo journalctl -u MySQL 
+      
+    - name: Change MySQL root password
+      run: |
+        mysqladmin -u root password "${{ env.MYSQL_ROOT_PASSWORD }}"
+
 
     - name: Create DB
       run: |
