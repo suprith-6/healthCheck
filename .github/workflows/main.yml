@@ -6,8 +6,8 @@ on:
  pull_request:
     branches: [main]
 
-env:
- MYSQL_ROOT_PASSWORD: "1998@Pupss"
+# env:
+#  MYSQL_ROOT_PASSWORD: "1998@Pupss"
 
 jobs:
  test:
