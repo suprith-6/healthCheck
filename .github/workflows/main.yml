@@ -34,9 +34,7 @@ jobs:
         node-version: 14
         
     - name: Install dependencies
-      run: |
-        rm node_modules/.bin/semver
-        npm install
+      run: npm ci --no-package-lock
       
     
     - name: Run integration tests
