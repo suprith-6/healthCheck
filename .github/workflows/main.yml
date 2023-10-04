@@ -18,7 +18,7 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: "1998@Pupss"
+          # MYSQL_ROOT_PASSWORD: "1998@Pupss"
           MYSQL_DATABASE: assignment1
         ports:
             - '8888:3306'
@@ -47,7 +47,7 @@ jobs:
 
     - name: Setting Root password for MySQL
       run: |
-        sudo mysql -h localhost --port 8888 -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '1998@Pupss';"
+        sudo mysqladmin -u root password "1998@Pupss"
       
     - name: Stop MySQL
       run: sudo systemctl stop mysql
