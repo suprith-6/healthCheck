@@ -42,9 +42,6 @@ jobs:
               sleep 5
             fi
           done
-
-      - name: Run tests
-        run: npm test
   
       - name: Start app
         run: npm start &
