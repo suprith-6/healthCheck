@@ -31,17 +31,16 @@ jobs:
 
       - name: Configure MySQL
         run: |
-          echo "[mysqld]" | sudo tee -a /etc/mysql/mysql.conf.d/mysqld.cnf
-          echo "skip-log-bin" | sudo tee -a /etc/mysql/mysql.conf.d/mysqld.cnf
+          echo "skip-log-bin" | sudo tee /etc/mysql/mysql.conf.d/docker.cnf
           sudo service mysql restart
           mysql -e "CREATE DATABASE assignment1;"
         continue-on-error: true
 
-
-
       - name: Set MySQL root password
         run: |
-          mysqladmin -u root password '1998@Pupss'
+          mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '1998@Pupss';"
+        continue-on-error: true
+
 
       - name: Install dependencies
         run: npm ci --no-package-lock
