@@ -1,68 +1,52 @@
-name: Health Check Integration Tests
+name: MySQL Server and API Tests
 
-on: 
+on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
-    
-    
+    branches:
+      - main
+
 jobs:
-
   test:
-
     runs-on: ubuntu-latest
 
-    services:
-    
-      mysql:
-        image: mysql:8  
-        env:
-          MYSQL_ROOT_PASSWORD: 1998@Pupss 
-          MYSQL_DATABASE: assignment1
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
-    
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: 14
-        
-    - name: Install dependencies
-      run: npm ci --no-package-lock
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
 
-    - name: Zest installation
-      run: npm install --save-dev jest
+      - name: Install dependencies
+        run: npm install
 
-    - name: Supertest installation
-      run: npm install --save-dev supertest
+      - name: Start MySQL container
+        run: |
+          docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=1998@Pupss -e MYSQL_DATABASE=assignment1 -d -p 3306:3306 mysql:latest
+          sleep 10
+          docker ps -a
+          docker logs mysql-container
+        continue-on-error: true
 
-    - name: Babel installation for ES6
-      run: npm install --save-dev babel-jest @babel/core @babel/preset-env
+      - name: Check MySQL health
+        run: docker exec mysql-container mysqladmin ping -h localhost -P 3306 -u root -p1998@Pupss
 
-    - name: Start MySQL
-      run: sudo systemctl start mysql
-
-    - name: Verify MySQL status
-      run: sudo systemctl status mysql
-
-    - name: Grant MySQL Privileges
-      run: |
-          sudo mysql -h 127.0.0.1 -u root -p1998@Pupss <<EOF
-          GRANT ALL PRIVILEGES ON assignment1.* TO 'root'@'localhost' IDENTIFIED BY '1998@Pupss';
-          FLUSH PRIVILEGES;
-          EOF
-    
-    - name: Run integration tests
-      env:
-        DATABASE_HOST: 127.0.0.1
-        DATABASE_USER: root
-        DATABASE_PASSWORD: 1998@Pupss
-        DATABASE_DB: assignment1
-      run: npm run test:integration
+      
+      - name: Run tests
+        run: npm test
+  
+      - name: Start app
+        run: npm start &
+  
+      - name: Test /healthz
+        run: |
+          if [ $(curl -s http://localhost:9000/healthz) = "200" ]; then
+            echo "Health check passed"
+          else
+            echo "Health check failed"  
+            exit 1
+          fi
