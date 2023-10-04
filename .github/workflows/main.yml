@@ -47,7 +47,7 @@ jobs:
       run: sudo journalctl -u MySQL 
 
     - name: Checking the credentials
-      run: sudo vim /etc/mysql/my.cnf
+      run: sudo grep -A1 '^root\[' /etc/mysql/my.cnf
 
     - name: Grant CREATE privilege to root user
       run: |
