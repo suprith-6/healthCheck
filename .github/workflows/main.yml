@@ -40,11 +40,13 @@ jobs:
 
     - name: Check MySQL logs
       run: sudo journalctl -u MySQL 
+     
+    - name: Wait for MySQL to start
+      run: sleep 10
       
     - name: Change MySQL root password
       run: |
-        mysqladmin -u root password "${{ env.MYSQL_ROOT_PASSWORD }}"
-
+        mysql -u root -p "${{ env.MYSQL_ROOT_PASSWORD }}" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${{ env.MYSQL_ROOT_PASSWORD }}'"
 
     - name: Create DB
       run: |
