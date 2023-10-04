@@ -1,10 +1,13 @@
 name: Node.js CI
 
-on:
+on: 
   push:
-    branches: [main]  
+    branches: [main]
   pull_request:
     branches: [main]
+
+env:
+  MYSQL_ROOT_PASSWORD: "1998@Pupss" 
 
 jobs:
 
@@ -16,32 +19,50 @@ jobs:
       db:
         image: mysql
         env:
-          MYSQL_ROOT_PASSWORD: "1998@Pupss"
+          MYSQL_ROOT_PASSWORD: ${{ env.MYSQL_ROOT_PASSWORD }}
 
     steps:
-    - uses: actions/checkout@v2
     
-    - name: Set up Node.js
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
       uses: actions/setup-node@v2
-      
+
     - name: Install dependencies
       run: npm install
-    
-    - name: Create DB
+
+    - name: Verify MySQL is running
+      run: |
+        sudo service mysql status
+
+    - name: Check port 
+      run: |
+        sudo lsof -i:3306
+
+    - name: Test connectivity   
+      run: |
+        mysqladmin -u root -p${{ env.MYSQL_ROOT_PASSWORD }} ping
+
+    - name: Start MySQL service
       run: | 
-        mysql -h 127.0.0.1 -u root -p "1998@Pupss" -e "CREATE DATABASE assignment1"
-    
-    - name: Run tests  
+        sudo service mysql start
+
+    - name: Create DB
+      run: |
+        mysql -u root -p ${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE assignment1"
+
+    - name: Run tests
       run: npm test
-            
+
     - name: Start app
       run: npm start &
-    
-    - name: Check /healthz
+        
+    - name: Test /healthz
       run: |
-        if [ $(curl -s http://localhost:9000/healthz) = "200" ] ; then
-          echo "Healthcheck passed"
-        else 
-          echo "Healthcheck failed"
+        if [ $(curl -s http://localhost:9000/healthz) = "200" ]; then
+          echo "Health check passed"
+        else
+          echo "Health check failed"  
           exit 1
         fi
