@@ -38,6 +38,9 @@ jobs:
 
     - name: Zest installation
       run: npm install --save-dev jest
+
+    - name: Supertest installation
+      run: npm install --save-dev supertest
     
     - name: Run integration tests
       env:
