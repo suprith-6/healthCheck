@@ -32,12 +32,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Clean npm cache
+      run: npm cache clean --force
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        cache-dependency-path: './server/package-lock.json'
+        cache-dependency-path: ./server/package-lock.json
     - run: npm install
     - run: npm run build --if-present
     - name: Start Node.js Server
