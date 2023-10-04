@@ -1,4 +1,4 @@
-name: MySQL Server and API Tests
+name: Node.js CI
 
 on:
   push:
@@ -9,62 +9,47 @@ on:
       - main
 
 jobs:
-  test:
+  build:
+
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: 1998@Pupss
+          MYSQL_DATABASE: assignment1
+        ports:
+          - 3306:3306
+
+    defaults:
+      run:
+        working-directory: server.js
+
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
-
-      - name: Install MySQL
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y mysql-server
-
-      - name: Start MySQL service
-        run: sudo service mysql start
-
-      - name: Configure MySQL
-        run: |
-          echo "skip-log-bin" | sudo tee /etc/mysql/mysql.conf.d/docker.cnf
-          sudo service mysql restart
-          mysql -e "CREATE DATABASE assignment1;"
-        continue-on-error: true
-
-      - name: Set MySQL root password
-        run: |
-          mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '1998@Pupss';"
-        continue-on-error: true
-
-
-      - name: Install dependencies
-        run: npm ci --no-package-lock
-
-      - name: Wait for MySQL to be ready
-        run: |
-          for i in {1..30}; do
-            if mysqladmin ping -h localhost -u root -p1998@Pupss; then
-              break
-            else
-              echo "MySQL not ready, retrying in 5 seconds..."
-              sleep 5
-            fi
-          done
-  
-      - name: Start app
-        run: npm start &
-
-      - name: Test /healthz
-        run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9000/healthz)
-          if [ -n "$response" ] && [ "$response" = "200" ]; then
-            echo "Health check passed"
-          else
-            echo "Health check failed"  
-            exit 1
-          fi
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: './server/package-lock.json'
+    - run: npm install
+    - run: npm run build --if-present
+    - name: Start Node.js Server
+      run: npm start &
+    - name: Wait for Node.js Server to Start
+      run: sleep 10 # Adjust as needed
+    - name: Test /healthz
+      run: |
+        response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9000/healthz)
+        if [ "$response" = "200" ]; then
+          echo "Health check passed"
+        else
+          echo "Health check failed"
+          exit 1
+        fi
