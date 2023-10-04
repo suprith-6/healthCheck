@@ -18,7 +18,7 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ROOT_PASSWORD: 1998@Pupss
           MYSQL_DATABASE: assignment1
         ports:
             - '8888:3306'
@@ -45,10 +45,10 @@ jobs:
     - name: Check MySQL logs
       run: sudo journalctl -u mysql 
 
-    - name: Setting Root password for MySQL
-      run: |
-         sudo mysql -e "UPDATE mysql.user SET authentication_string=PASSWORD('1998@Pupss') WHERE User='root';"
-         sudo mysql -e "FLUSH PRIVILEGES;"
+    # - name: Setting Root password for MySQL
+    #   run: |
+    #      sudo mysql -e "UPDATE mysql.user SET authentication_string=PASSWORD('1998@Pupss') WHERE User='root';"
+    #      sudo mysql -e "FLUSH PRIVILEGES;"
       
     # - name: Stop MySQL
     #   run: sudo systemctl stop mysql
@@ -64,7 +64,7 @@ jobs:
 
     - name: Create DB
       run: |
-        sudo mysql -u root -p "1998@Pupss" -e "CREATE DATABASE assignment1"
+        sudo mysql -u root -p 1998@Pupss -e "CREATE DATABASE assignment1"
 
     - name: Run tests
       run: npm test
