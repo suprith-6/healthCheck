@@ -21,21 +21,32 @@ jobs:
         with:
           node-version: 14
 
+      - name: Install MySQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-server
+
+      - name: Start MySQL service
+        run: sudo service mysql start
+
+      - name: Configure MySQL
+        run: |
+          echo "[mysqld]" | sudo tee -a /etc/mysql/mysql.conf.d/mysqld.cnf
+          echo "skip-log-bin" | sudo tee -a /etc/mysql/mysql.conf.d/mysqld.cnf
+          sudo service mysql restart
+          mysql -e "CREATE DATABASE assignment1;"
+
+      - name: Set MySQL root password
+        run: |
+          mysqladmin -u root password '1998@Pupss'
+
       - name: Install dependencies
         run: npm ci --no-package-lock
-
-      - name: Start MySQL container
-        run: |
-          docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=1998@Pupss -e MYSQL_DATABASE=assignment1 -d -p 3306:3306 mysql:latest
-          sleep 10
-          docker ps -a
-          docker logs mysql-container
-        continue-on-error: true
 
       - name: Wait for MySQL to be ready
         run: |
           for i in {1..30}; do
-            if docker exec mysql-container mysqladmin ping -h 127.0.0.1 -P 3306 -u root --password=1998@Pupss; then
+            if mysqladmin ping -h localhost -u root -p1998@Pupss; then
               break
             else
               echo "MySQL not ready, retrying in 5 seconds..."
@@ -48,10 +59,10 @@ jobs:
 
       - name: Test /healthz
         run: |
-            response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9000/healthz)
-            if [ -n "$response" ] && [ "$response" = "200" ]; then
-              echo "Health check passed"
-            else
-              echo "Health check failed"  
-              exit 1
-            fi
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9000/healthz)
+          if [ -n "$response" ] && [ "$response" = "200" ]; then
+            echo "Health check passed"
+          else
+            echo "Health check failed"  
+            exit 1
+          fi
