@@ -42,7 +42,7 @@ jobs:
       run: sudo journalctl -u mysql 
 
     - name: Setting Root password for MySQL
-      run: sudo mysqladmin -u root password "${{env.MYSQL_ROOT_PASSWORD}}"
+      run: mysql -u root password "${{env.MYSQL_ROOT_PASSWORD}}"
 
     - name: Stop MySQL
       run: sudo systemctl stop mysql
