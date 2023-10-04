@@ -33,9 +33,9 @@ jobs:
         continue-on-error: true
 
       - name: Check MySQL health
-        run: docker exec mysql-container mysqladmin ping -h localhost -P 3306 -u root -p1998@Pupss
+        run: docker exec mysql-container mysqladmin ping -h localhost -P 3306 -u root --password=1998@Pupss
 
-      
+    
       - name: Run tests
         run: npm test
   
