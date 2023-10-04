@@ -43,11 +43,16 @@ jobs:
       run: sudo systemctl status mysql
 
     - name: Check MySQL logs
-      run: sudo journalctl -u mysql 
+      run: sudo journalctl -u MySQL 
+
+    # - name: Check MySQL User Privileges
+    #   run: |
+    #     sudo mysql -u root -p"1998@Pupss" -e "SELECT user, host FROM mysql.user WHERE user = 'root';"
+
 
     - name: Create DB
       run: |
-        sudo mysql -u root -p"1998@Pupss" -e "CREATE DATABASE assignment1"
+        mysql -u root -p"1998@Pupss" -e "CREATE DATABASE assignment1"
 
     - name: Run tests
       run: npm test
