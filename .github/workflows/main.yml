@@ -37,13 +37,13 @@ jobs:
 
     # Use systemctl to control service
     - name: Start MySQL
-      run: systemctl start mysql
+      run: sudo systemctl start mysql
 
     - name: Verify MySQL status
-      run: systemctl status mysql
+      run: sudo systemctl status mysql
 
     - name: Check MySQL logs
-      run: journalctl -u MySQL 
+      run: sudo journalctl -u MySQL 
 
     # - name: Check MySQL User Privileges
     #   run: |
