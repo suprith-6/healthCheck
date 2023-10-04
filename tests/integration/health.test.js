@@ -8,6 +8,6 @@ describe('Health check endpoint', () => {
   });
 });
 
-afterAll((done) => {
-  server.close(done);
+    afterAll((done) => {
+    server.close(done);
 });

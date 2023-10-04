@@ -64,7 +64,7 @@ async function checkDatabaseConnection() {
 
 const port = 9000;
 
-app.listen(port, () => {
+const server=app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
